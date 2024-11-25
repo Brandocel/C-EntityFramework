@@ -1,0 +1,29 @@
+﻿@model HokaProvedorWeb.Models.AltaProveedorViewModel
+
+<h2>Alta de Proveedor</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+
+@using (Html.BeginForm("GuardarProveedor", "AltaProveedor", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div>
+        <label for="RFC">RFC</label>
+        @Html.TextBoxFor(m => m.RFC, new { @class = "form-control" })
+    </div>
+    <div>
+        <label for="NombreRazonSocial">Razón Social</label>
+        @Html.TextBoxFor(m => m.NombreRazonSocial, new { @class = "form-control" })
+    </div>
+    <div>
+        <label for="Nombre">Nombre</label>
+        @Html.TextBoxFor(m => m.Nombre, new { @class = "form-control" })
+    </div>
+    <div>
+        <label for="PdfSituacionFiscal">Constancia Fiscal</label>
+        <input type="file" name="PdfSituacionFiscal" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+}

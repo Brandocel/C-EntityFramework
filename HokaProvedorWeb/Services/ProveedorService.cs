@@ -33,5 +33,12 @@ namespace HokaProvedorWeb.Services
                 LimiteCreditoValor = (float?)p.LimiteCreditoValor
             }).ToList();
         }
+
+        public async Task<bool> GuardarProveedorAsync(AltaProveedorViewModel proveedor)
+        {
+            return await _repository.GuardarProveedorAsync(proveedor);
+        }
+
+      
     }
 }

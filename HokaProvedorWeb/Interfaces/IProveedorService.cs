@@ -9,5 +9,6 @@ namespace HokaProvedorWeb.Interfaces
     public interface IProveedorService
     {
         Task<List<ProveedorViewModel>> ObtenerProveedoresAsync();
+        Task<bool> GuardarProveedorAsync(AltaProveedorViewModel proveedor);
     }
 }

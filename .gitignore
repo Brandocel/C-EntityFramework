@@ -1,0 +1,84 @@
+# Visual Studio Specific
+.vs/
+*.user
+*.suo
+*.vcxproj.user
+*.pdb
+*.exe
+*.cache
+*.ilk
+*.log
+*.sdf
+*.ipch
+*.aps
+*.ncb
+*.obj
+*.pch
+*.idb
+*.tlog
+*.log
+*.lastbuildstate
+*.sbr
+*.opensdf
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+
+# Rider Specific
+.idea/
+*.iml
+
+# Build Results
+bin/
+obj/
+Debug/
+Release/
+TestResults/
+
+# ASP.NET Core Specific
+wwwroot/lib/
+node_modules/
+.env
+*.log
+*.dat
+*.config
+
+# Entity Framework Migrations
+migrations/
+
+# NuGet Packages
+*.nupkg
+*.snupkg
+packages/
+
+# Compiled Output
+*.dll
+*.pdb
+*.class
+*.pyc
+*.o
+*.out
+*.so
+
+# Logs and Generated Files
+*.log
+*.bak
+*.swp
+*.tmp
+*.DS_Store
+Thumbs.db
+*.vspscc
+*.vssscc
+*.class
+*.py[cod]
+
+# Ignore archives and backups
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.bak
+*.bak2
+
+# JetBrains Rider
+.idea/
