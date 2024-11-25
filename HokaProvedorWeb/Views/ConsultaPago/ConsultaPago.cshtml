@@ -1,0 +1,80 @@
+﻿@model List<HokaProvedorWeb.Models.ConsultaPagoViewModel>
+
+@{
+    ViewBag.Title = "Consulta de Pago de Proveedores";
+}
+
+<div class="container">
+    <h1>@ViewBag.Title</h1>
+
+    <form asp-action="ConsultaPago" method="post">
+        <div class="form-group">
+            <label for="fechaInicio">Fecha Inicio:</label>
+            <input type="date" name="fechaInicio" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="fechaFin">Fecha Fin:</label>
+            <input type="date" name="fechaFin" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="proveedorNombre">Proveedor:</label>
+            <select name="proveedorNombre" class="form-control">
+                <option value="">Seleccione un proveedor</option>
+                @foreach (var proveedor in ViewBag.ListaProveedores)
+                {
+                    <option value="@proveedor.Value">@proveedor.Text</option>
+                }
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="formaPago">Forma de Pago:</label>
+            <select name="formaPago" class="form-control">
+                <option value="">Seleccione una forma de pago</option>
+                <option value="Efectivo">Efectivo</option>
+                <option value="Transferencia">Transferencia</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+
+    @if (Model != null && Model.Count > 0)
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Folio Entrada</th>
+                    <th>Proveedor</th>
+                    <th>Nombre/Razón Social</th>
+                    <th>RFC</th>
+                    <th>Concepto</th>
+                    <th>Fecha Factura</th>
+                    <th>Importe</th>
+                    <th>Abono</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.FolioEntrada</td>
+                        <td>@item.Proveedor</td>
+                        <td>@item.NombreRazonSocial</td>
+                        <td>@item.RFC</td>
+                        <td>@item.Concepto</td>
+                        <td>@item.FechaFactura.ToShortDateString()</td>
+                        <td>@item.Importe.ToString("C")</td>
+                        <td>@item.Abono.ToString("C")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No se encontraron resultados.</p>
+    }
+</div>

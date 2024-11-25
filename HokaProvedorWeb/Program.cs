@@ -23,6 +23,9 @@ builder.Services.AddScoped<IProveedorRepository, ProveedorRepository>();
 builder.Services.AddScoped<IProveedorService, ProveedorService>();
 builder.Services.AddScoped<IConceptoRepository, ConceptoRepository>();
 builder.Services.AddScoped<IConceptoService, ConceptoService>();
+builder.Services.AddScoped<IConsultaPagoService, ConsultaPagoService>();
+builder.Services.AddScoped<IConsultaPagoRepository, ConsultaPagoRepository>();
+
 
 
 var app = builder.Build();
