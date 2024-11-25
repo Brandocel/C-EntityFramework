@@ -8,6 +8,7 @@ namespace HokaProvedorWeb.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Proveedor> Provedores { get; set; }
+        public DbSet<Concepto> Conceptos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -39,6 +40,12 @@ namespace HokaProvedorWeb.Data
                 entity.Property(e => e.Folio).HasColumnName("folio");
 
                 // Configuración adicional (si es necesario)
+            });
+
+            modelBuilder.Entity<Concepto>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.ConceptoPago).HasColumnName("Concepto");
             });
         }
     }

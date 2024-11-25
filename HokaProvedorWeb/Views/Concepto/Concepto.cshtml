@@ -1,0 +1,78 @@
+﻿@{
+    ViewBag.Title = "Agregar Nuevo Concepto";
+}
+
+<main>
+    <h1 class="text-primary">Agregar Nuevo Concepto</h1>
+    <div class="form-group">
+        <label for="nuevoConcepto" class="form-label">Concepto del Pago:</label>
+        <input type="text" id="nuevoConcepto" class="form-control" required placeholder="Ingresa el concepto" />
+        <span class="text-danger d-none" id="errorConcepto">Este campo es obligatorio.</span>
+    </div>
+
+    <button class="btn btn-primary mt-3" onclick="guardarNuevoConcepto()">Agregar Concepto</button>
+</main>
+
+<!-- Toast container -->
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 5">
+    <div id="toast" class="toast align-items-center bg-success text-white border-0" role="alert" aria-live="assertive" aria-atomic="true" style="display:none;">
+        <div class="d-flex">
+            <div class="toast-body" id="toast-message">
+                Concepto agregado exitosamente.
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function guardarNuevoConcepto() {
+        var nuevoConcepto = document.getElementById("nuevoConcepto").value;
+
+      
+        if (nuevoConcepto.trim() === '') {
+            document.getElementById("errorConcepto").classList.remove('d-none');
+            return;
+        } else {
+            document.getElementById("errorConcepto").classList.add('d-none');
+        }
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("AgregarConcepto", "Concepto")',
+            data: { conceptoPago: nuevoConcepto },
+            success: function (response) {
+                if (response.success) {
+                    
+                    mostrarToast("Concepto agregado exitosamente.", "success");
+                    document.getElementById("nuevoConcepto").value = '';
+                } else {
+                    mostrarToast(response.message, "error");
+                }
+            },
+            error: function () {
+                mostrarToast("Ocurrió un error al intentar agregar el concepto.", "error");
+            }
+        });
+    }
+
+    function mostrarToast(message, type = "success") {
+     
+        var toast = document.getElementById("toast");
+        var toastMessage = document.getElementById("toast-message");
+
+        toastMessage.textContent = message;
+        if (type === "error") {
+            toast.classList.replace("bg-success", "bg-danger");
+        } else {
+            toast.classList.replace("bg-danger", "bg-success");
+        }
+        toast.style.display = "block";
+        var bootstrapToast = new bootstrap.Toast(toast, { delay: 3000 }); 
+        bootstrapToast.show();
+
+        setTimeout(() => {
+            toast.style.display = "none";
+        }, 3500);
+    }
+</script>

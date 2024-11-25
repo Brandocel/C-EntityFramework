@@ -21,6 +21,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Registrar repositorios y servicios
 builder.Services.AddScoped<IProveedorRepository, ProveedorRepository>();
 builder.Services.AddScoped<IProveedorService, ProveedorService>();
+builder.Services.AddScoped<IConceptoRepository, ConceptoRepository>();
+builder.Services.AddScoped<IConceptoService, ConceptoService>();
+
 
 var app = builder.Build();
 
