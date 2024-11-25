@@ -1,0 +1,42 @@
+﻿@model IEnumerable<HokaProvedorWeb.Models.ProveedorViewModel>
+
+<div class="container">
+    <h1 class="mt-4">Lista de Proveedores</h1>
+
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Proveedor</th>
+                <th>Razón Social</th>
+                <th>Ciudad</th>
+                <th>Estado</th>
+                <th>Teléfonos</th>
+                <th>Email</th>
+                <th>Límite de Crédito</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var proveedor in Model)
+                {
+                    <tr>
+                        <td>@proveedor.Provedor</td>
+                        <td>@proveedor.NombreRazonSocial</td>
+                        <td>@proveedor.Ciudad</td>
+                        <td>@proveedor.Estado</td>
+                        <td>@proveedor.Telefonos</td>
+                        <td>@proveedor.Email</td>
+                        <td>@proveedor.LimiteCreditoValor:C</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7" class="text-center">No hay proveedores disponibles.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
