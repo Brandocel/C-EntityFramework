@@ -1,0 +1,31 @@
+﻿@{
+    ViewBag.Title = "Tipo de Solicitud";
+}
+
+<div class="container mt-5">
+    <h1 class="titulo-formulario text-center">Seleccione el Tipo de Solicitud</h1>
+    <form onsubmit="event.preventDefault(); redirigir();" class="mt-4">
+        <div class="mb-3">
+            <label for="tipoSolicitud" class="form-label">Tipo de Solicitud:</label>
+            <select id="tipoSolicitud" class="form-select" aria-label="Seleccione el tipo de solicitud" required>
+                <option value="" disabled selected>Seleccione la opción</option>
+                <option value="Pago">Pago</option>
+                <option value="Reembolso">Reembolso</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Enviar</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function redirigir() {
+            const tipoSolicitud = document.getElementById("tipoSolicitud").value;
+            if (tipoSolicitud === "Pago") {
+                window.location.href = '@Url.Action("Pago", "Pago")';
+            } else if (tipoSolicitud === "Reembolso") {
+                window.location.href = '@Url.Action("Reembolso", "Reembolso")';
+            }
+        }
+    </script>
+}

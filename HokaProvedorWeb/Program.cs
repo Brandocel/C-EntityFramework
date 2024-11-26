@@ -25,6 +25,8 @@ builder.Services.AddScoped<IConceptoRepository, ConceptoRepository>();
 builder.Services.AddScoped<IConceptoService, ConceptoService>();
 builder.Services.AddScoped<IConsultaPagoService, ConsultaPagoService>();
 builder.Services.AddScoped<IConsultaPagoRepository, ConsultaPagoRepository>();
+builder.Services.AddScoped<IPagoRepository, PagoRepository>();
+builder.Services.AddScoped<IPagoService, PagoService>();
 
 
 
