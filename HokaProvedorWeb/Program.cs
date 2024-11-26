@@ -27,6 +27,10 @@ builder.Services.AddScoped<IConsultaPagoService, ConsultaPagoService>();
 builder.Services.AddScoped<IConsultaPagoRepository, ConsultaPagoRepository>();
 builder.Services.AddScoped<IPagoRepository, PagoRepository>();
 builder.Services.AddScoped<IPagoService, PagoService>();
+builder.Services.AddScoped<IReembolsoService, ReembolsoService>();
+builder.Services.AddScoped<IReembolsoRepository, ReembolsoRepository>();
+
+
 
 
 

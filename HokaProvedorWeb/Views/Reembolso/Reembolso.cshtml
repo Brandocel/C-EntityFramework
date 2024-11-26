@@ -1,0 +1,148 @@
+﻿@model HokaProvedorWeb.Models.ReembolsoViewModel
+
+@{
+    ViewData["Title"] = "Formulario de Reembolso";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Formulario de Reembolso</h2>
+
+    <div class="mb-4">
+        <button type="button" class="btn btn-secondary" onclick="window.location.href='@Url.Action("Index", "Home")'">
+            <i class="fas fa-arrow-left"></i> Regresar
+        </button>
+    </div>
+
+    <form asp-action="Reembolso" asp-controller="Reembolso" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+        <div class="row g-3">
+
+            <!-- Nota/Factura -->
+            <div class="col-md-6">
+                <label asp-for="NotaFactura" class="form-label">Nota/Factura</label>
+                <select asp-for="NotaFactura" asp-items="Model.NotaFacturaOptions" class="form-select" required>
+                    <option value="">Seleccionar</option>
+                </select>
+                <span asp-validation-for="NotaFactura" class="text-danger"></span>
+            </div>
+
+            <!-- Proveedor/Acreedor -->
+            <div class="col-md-6">
+                <label asp-for="NombreRazonSocial" class="form-label">Proveedor/Acreedor</label>
+                <select asp-for="NombreRazonSocial" asp-items="Model.NombreRazonSocialOptions" class="form-select" required>
+                    <option value="">Seleccionar</option>
+                </select>
+                <span asp-validation-for="NombreRazonSocial" class="text-danger"></span>
+            </div>
+
+            <!-- Compra/Gasto -->
+            <div class="col-md-6">
+                <label asp-for="CompraGasto" class="form-label">Compra/Gasto</label>
+                <select asp-for="CompraGasto" asp-items="Model.CompraGastoOptions" class="form-select" required>
+                    <option value="">Seleccionar</option>
+                </select>
+                <span asp-validation-for="CompraGasto" class="text-danger"></span>
+            </div>
+
+            <!-- Concepto -->
+            <div class="col-md-6">
+                <label asp-for="Concepto" class="form-label">Concepto</label>
+                <select asp-for="Concepto" asp-items="Model.ConceptoOptions" class="form-select" required>
+                    <option value="">Seleccionar</option>
+                </select>
+                <span asp-validation-for="Concepto" class="text-danger"></span>
+            </div>
+
+            <!-- Observación -->
+            <div class="col-md-12">
+                <label asp-for="Observacion" class="form-label">Observación</label>
+                <textarea asp-for="Observacion" class="form-control" placeholder="Ingrese su observación aquí"></textarea>
+                <span asp-validation-for="Observacion" class="text-danger"></span>
+            </div>
+
+            <!-- Folio -->
+            <div class="col-md-6">
+                <label asp-for="Folio" class="form-label">Folio</label>
+                <input asp-for="Folio" class="form-control" readonly />
+                <span asp-validation-for="Folio" class="text-danger"></span>
+            </div>
+
+            <!-- Importe -->
+            <div class="col-md-6">
+                <label asp-for="Importe" class="form-label">Importe</label>
+                <input asp-for="Importe" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="Importe" class="text-danger"></span>
+            </div>
+
+            <!-- IVA -->
+            <div class="col-md-6">
+                <label asp-for="Iva" class="form-label">IVA</label>
+                <input asp-for="Iva" class="form-control" type="number" step="0.01" />
+                <span asp-validation-for="Iva" class="text-danger"></span>
+            </div>
+
+            <!-- Total -->
+            <div class="col-md-6">
+                <label asp-for="Total" class="form-label">Total</label>
+                <input asp-for="Total" class="form-control" type="number" readonly />
+                <span asp-validation-for="Total" class="text-danger"></span>
+            </div>
+
+            <!-- Subir PDF -->
+            <div class="col-md-6">
+                <label asp-for="PdfUpload" class="form-label">Subir PDF</label>
+                <input asp-for="PdfUpload" type="file" class="form-control" />
+                <span asp-validation-for="PdfUpload" class="text-danger"></span>
+            </div>
+
+            <!-- Subir XML -->
+            <div class="col-md-6">
+                <label asp-for="XmlUpload" class="form-label">Subir XML</label>
+                <input asp-for="XmlUpload" type="file" class="form-control" onchange="extraerUUID()" />
+                <span asp-validation-for="XmlUpload" class="text-danger"></span>
+            </div>
+
+            <!-- UUID -->
+            <div class="col-md-6">
+                <label asp-for="UUID" class="form-label">UUID</label>
+                <input asp-for="UUID" class="form-control" readonly />
+                <span asp-validation-for="UUID" class="text-danger"></span>
+            </div>
+
+            <!-- Botón de guardar -->
+            <div class="col-12 d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Mensajes -->
+    @if (ViewBag.Message != null)
+    {
+        <div class="alert alert-info mt-4">@ViewBag.Message</div>
+    }
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-danger mt-4">@ViewBag.Error</div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function extraerUUID() {
+            var xmlFile = document.getElementById("XmlUpload").files[0];
+            var formData = new FormData();
+            formData.append("xmlFile", xmlFile);
+
+            fetch('@Url.Action("ExtraerUUID", "Reembolso")', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("UUID").value = data.UUID || "No disponible";
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+}
