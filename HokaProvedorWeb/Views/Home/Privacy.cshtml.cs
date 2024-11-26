@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace HokaProvedorWeb.Pages
+namespace HokaProvedorWeb.Views.Home
 {
     public class PrivacyModel : PageModel
     {
