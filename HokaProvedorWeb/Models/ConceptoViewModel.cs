@@ -2,14 +2,14 @@
 {
     public class ConceptoViewModel
     {
-        public string ConceptoPago { get; set; }
+        public string? ConceptoPago { get; set; }
 
         public ConceptoViewModel(string conceptoPago)
         {
             ConceptoPago = conceptoPago;
         }
 
-        public bool Validar()
+        public bool? Validar()
         {
             return !string.IsNullOrWhiteSpace(ConceptoPago);
         }
