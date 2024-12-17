@@ -65,9 +65,10 @@
                         <td>@item.NombreRazonSocial</td>
                         <td>@item.RFC</td>
                         <td>@item.Concepto</td>
-                        <td>@item.FechaFactura.ToShortDateString()</td>
-                        <td>@item.Importe.ToString("C")</td>
-                        <td>@item.Abono.ToString("C")</td>
+                        <td>@(item.FechaFactura.HasValue ? item.FechaFactura.Value.ToShortDateString() : "N/A")</td>
+                        <td>@(item.Importe.HasValue ? item.Importe.Value.ToString("C") : "N/A")</td>
+                        <td>@(item.Abono.HasValue ? item.Abono.Value.ToString("C") : "N/A")</td>
+
                     </tr>
                 }
             </tbody>

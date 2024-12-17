@@ -1,42 +1,36 @@
-﻿@model IEnumerable<HokaProvedorWeb.Models.ProveedorViewModel>
+﻿@model IEnumerable<HokaProvedorWeb.Models.ViewModels.ProveedorViewModel>
 
-<div class="container">
-    <h1 class="mt-4">Lista de Proveedores</h1>
 
-    <table class="table table-striped mt-3">
+<div>
+    <h2>Lista de Proveedores</h2>
+    <form method="get">
+        <!-- Filtros -->
+        <input type="date" name="fechaInicio" />
+        <input type="date" name="fechaFin" />
+        <input type="text" name="proveedor" placeholder="Proveedor" />
+        <button type="submit">Buscar</button>
+    </form>
+
+    <table>
         <thead>
             <tr>
-                <th>Proveedor</th>
-                <th>Razón Social</th>
-                <th>Ciudad</th>
-                <th>Estado</th>
-                <th>Teléfonos</th>
-                <th>Email</th>
-                <th>Límite de Crédito</th>
+                <th>Nombre Razon Social</th>
+                <th>Importe</th>
+                <th>Iva</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>
-            @if (Model != null && Model.Any())
-            {
-                foreach (var proveedor in Model)
-                {
-                    <tr>
-                        <td>@proveedor.Provedor</td>
-                        <td>@proveedor.NombreRazonSocial</td>
-                        <td>@proveedor.Ciudad</td>
-                        <td>@proveedor.Estado</td>
-                        <td>@proveedor.Telefonos</td>
-                        <td>@proveedor.Email</td>
-                        <td>@proveedor.LimiteCreditoValor:C</td>
-                    </tr>
-                }
-            }
-            else
+            @foreach (var p in Model)
             {
                 <tr>
-                    <td colspan="7" class="text-center">No hay proveedores disponibles.</td>
+                    <td>@p.NombreRazonSocial</td>
+                    <td>@p.Importe</td>
+                    <td>@p.Iva</td>
+                    <td>@p.Total</td>
                 </tr>
             }
         </tbody>
     </table>
 </div>
+
