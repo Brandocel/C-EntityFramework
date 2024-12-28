@@ -1,8 +1,8 @@
-﻿using HokaProvedorWeb.Interfaces;
-using HokaProvedorWeb.Models;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using HokaProvedorWeb.Interfaces;
+using HokaProvedorWeb.Models;
 
 namespace HokaProvedorWeb.Services
 {
@@ -15,30 +15,52 @@ namespace HokaProvedorWeb.Services
             _repository = repository;
         }
 
-        public async Task<List<ProveedorViewModel>> ObtenerProveedoresAsync()
+        public async Task<List<ProveedorViewModel>> ObtenerProveedoresAsync(DateTime? fechaInicio, DateTime? fechaFin, string proveedor, string formaPago)
         {
-           
-            var proveedores = await _repository.ObtenerTodosAsync();
+            return await _repository.ObtenerProveedoresAsync(fechaInicio, fechaFin, proveedor, formaPago);
+        }
 
+        public async Task<bool> GuardarAbonoAsync(int folioEntrada, decimal abono, string formaPago, DateTime fechaAbono)
+        {
+            // Aquí puedes agregar lógica adicional, como validar que el abono no exceda el saldo
+            return await _repository.GuardarAbonoAsync(folioEntrada, abono, formaPago, fechaAbono);
+        }
 
-            return proveedores.Select(p => new ProveedorViewModel
-            {
-                Provedor = p.Provedor,
-                Nombre = p.Nombre,
-                NombreRazonSocial = p.NombreRazonSocial,
-                Ciudad = p.Ciudad,
-                Estado = p.Estado,
-                Telefonos = p.Telefonos,
-                Email = p.Email,
-                LimiteCreditoValor = (float?)p.LimiteCreditoValor
-            }).ToList();
+        public async Task<bool> GuardarFacturaPdfAsync(byte[] facturaPdf, string nombreRazonSocial)
+        {
+            // Validar que el archivo no esté vacío
+            if (facturaPdf == null || facturaPdf.Length == 0)
+                throw new ArgumentException("El archivo de factura no puede estar vacío.");
+
+            return await _repository.GuardarFacturaPdfAsync(facturaPdf, nombreRazonSocial);
+        }
+
+        public async Task<bool> GuardarComprobantePdfAsync(byte[] comprobantePdf, string nombreRazonSocial)
+        {
+            // Validar que el archivo no esté vacío
+            if (comprobantePdf == null || comprobantePdf.Length == 0)
+                throw new ArgumentException("El archivo de comprobante no puede estar vacío.");
+
+            return await _repository.GuardarComprobantePdfAsync(comprobantePdf, nombreRazonSocial);
+        }
+
+        public async Task<bool> ActualizarProveedorAsync(ProveedorViewModel proveedor)
+        {
+            if (proveedor == null)
+                throw new ArgumentNullException(nameof(proveedor));
+
+            return await _repository.ActualizarProveedorAsync(proveedor);
+        }
+
+        public async Task<bool> EliminarProveedorAsync(int folioEntrada)
+        {
+            return await _repository.EliminarProveedorAsync(folioEntrada);
         }
 
         public async Task<bool> GuardarProveedorAsync(AltaProveedorViewModel proveedor)
         {
+            // Implementación del método
             return await _repository.GuardarProveedorAsync(proveedor);
         }
-
-      
     }
 }

@@ -1,36 +1,157 @@
-﻿@model IEnumerable<HokaProvedorWeb.Models.ViewModels.ProveedorViewModel>
+﻿@model List<HokaProvedorWeb.Models.ProveedorViewModel>
 
+@{
+    ViewBag.Title = "Gestión de Proveedores";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
-<div>
-    <h2>Lista de Proveedores</h2>
-    <form method="get">
-        <!-- Filtros -->
-        <input type="date" name="fechaInicio" />
-        <input type="date" name="fechaFin" />
-        <input type="text" name="proveedor" placeholder="Proveedor" />
-        <button type="submit">Buscar</button>
+<div class="container mt-4">
+    <h1 class="text-center">@ViewBag.Title</h1>
+
+    <!-- Formulario de Filtros -->
+    <form id="filtroForm" class="row g-3">
+        <div class="col-md-3">
+            <label for="fechaInicio" class="form-label">Fecha Inicio</label>
+            <input type="date" id="fechaInicio" name="fechaInicio" class="form-control">
+        </div>
+        <div class="col-md-3">
+            <label for="fechaFin" class="form-label">Fecha Fin</label>
+            <input type="date" id="fechaFin" name="fechaFin" class="form-control">
+        </div>
+        <div class="col-md-3">
+            <label for="proveedor" class="form-label">Proveedor</label>
+            <select id="proveedor" name="proveedor" class="form-select">
+                <option value="">Todos</option>
+                @foreach (var proveedor in ViewBag.ListaProveedores ?? new List<SelectListItem>())
+                {
+                    <option value="@proveedor.Value">@proveedor.Text</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="formaPago" class="form-label">Forma de Pago</label>
+            <select id="formaPago" name="formaPago" class="form-select">
+                <option value="">Todos</option>
+                <option value="Efectivo">Efectivo</option>
+                <option value="Transferencia">Transferencia</option>
+            </select>
+        </div>
+        <div class="col-12 text-center">
+            <button type="button" id="btnBuscar" class="btn btn-primary">Buscar</button>
+            <button type="button" id="btnMostrarTodos" class="btn btn-secondary">Mostrar Todos</button>
+        </div>
     </form>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Nombre Razon Social</th>
-                <th>Importe</th>
-                <th>Iva</th>
-                <th>Total</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var p in Model)
-            {
+    <!-- Tabla de Resultados -->
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered">
+            <thead class="table-dark">
                 <tr>
-                    <td>@p.NombreRazonSocial</td>
-                    <td>@p.Importe</td>
-                    <td>@p.Iva</td>
-                    <td>@p.Total</td>
+                    <th>Fecha Factura</th>
+                    <th>Proveedor</th>
+                    <th>Nombre Razón Social</th>
+                    <th>Observaciones</th>
+                    <th>Días de Crédito</th>
+                    <th>Fecha Vencimiento</th>
+                    <th>Folio Entrada</th>
+                    <th>Folio Pago</th>
+                    <th>Importe</th>
+                    <th>Total</th>
+                    <th>Saldo</th>
+                    <th>Forma de Pago</th>
+                    <th>Acciones</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody id="resultados">
+                <!-- Los resultados se cargarán aquí dinámicamente -->
+            </tbody>
+        </table>
+    </div>
 </div>
 
+<script>
+    $(document).ready(function () {
+        // Evento para buscar con filtros
+        $('#btnBuscar').click(function () {
+            cargarProveedores();
+        });
+
+        // Evento para mostrar todos los registros
+        $('#btnMostrarTodos').click(function () {
+            cargarProveedores(true);
+        });
+
+        // Función para cargar proveedores
+        function cargarProveedores(mostrarTodos = false) {
+            const fechaInicio = $('#fechaInicio').val();
+            const fechaFin = $('#fechaFin').val();
+            const proveedor = mostrarTodos ? "todos" : $('#proveedor').val();
+            const formaPago = $('#formaPago').val();
+
+            $.ajax({
+                url: '/api/Proveedor/ObtenerProveedores',
+                type: 'GET',
+                data: { fechaInicio, fechaFin, proveedor, formaPago },
+                success: function (data) {
+                    $('#resultados').empty();
+
+                    if (data.length === 0) {
+                        $('#resultados').append('<tr><td colspan="12" class="text-center">No se encontraron resultados</td></tr>');
+                    } else {
+                        data.forEach(item => {
+                            $('#resultados').append(`
+                                <tr data-id="${item.folioEntrada}">
+                                    <td>${new Date(item.fechaFactura).toLocaleDateString()}</td>
+                                    <td>${item.provedor}</td>
+                                    <td>${item.nombreRazonSocial}</td>
+                                    <td>${item.observaciones || ''}</td>
+                                    <td>${item.diasCredito}</td>
+                                    <td>${new Date(item.fechaVencimiento).toLocaleDateString()}</td>
+                                    <td>${item.folioEntrada}</td>
+                                    <td>${item.folio || ''}</td>
+                                    <td>${item.importe.toFixed(2)}</td>
+                                    <td>${item.total.toFixed(2)}</td>
+                                    <td>${(item.total - item.abono).toFixed(2)}</td>
+                                    <td>${item.formaPago || ''}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-primary btnEditar">Editar</button>
+                                        <button class="btn btn-sm btn-danger btnEliminar">Eliminar</button>
+                                    </td>
+                                </tr>
+                            `);
+                        });
+                    }
+                },
+                error: function () {
+                    alert('Error al cargar los datos.');
+                }
+            });
+        }
+
+        // Evento para eliminar un proveedor
+        $(document).on('click', '.btnEliminar', function () {
+            const folioEntrada = $(this).closest('tr').data('id');
+
+            if (confirm('¿Estás seguro de que deseas eliminar este proveedor?')) {
+                $.ajax({
+                    url: `/api/Proveedor/EliminarProveedor/${folioEntrada}`,
+                    type: 'DELETE',
+                    success: function (response) {
+                        alert(response.message);
+                        cargarProveedores();
+                    },
+                    error: function () {
+                        alert('Error al eliminar el proveedor.');
+                    }
+                });
+            }
+        });
+
+        // Evento para editar un proveedor
+        $(document).on('click', '.btnEditar', function () {
+            const folioEntrada = $(this).closest('tr').data('id');
+            // Implementar funcionalidad de edición (ej. modal o formulario)
+            alert(`Editar proveedor con folio: ${folioEntrada}`);
+        });
+    });
+</script>

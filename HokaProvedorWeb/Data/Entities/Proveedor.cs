@@ -1,48 +1,22 @@
-﻿public class Proveedor
+﻿using System;
+
+namespace HokaProvedorWeb.Data.Entities
 {
-    public int Provedor { get; set; }
-    public string? Nombre { get; set; }
-    public string? NombreRazonSocial { get; set; }
-    public string? Direccion1 { get; set; }
-    public string? Direccion2 { get; set; }
-    public string? Colonia { get; set; }
-    public string? Ciudad { get; set; }
-    public string? Estado { get; set; }
-    public string? Pais { get; set; }
-    public string? Telefonos { get; set; }
-    public string? Fax { get; set; }
-    public string? Cp { get; set; }
-    public string? Email { get; set; }
-    public string? Internet { get; set; }
-    public double? LimiteCreditoValor { get; set; }
-    public short? LimiteCreditoDias { get; set; }
-    public double? DescuentoPp { get; set; }
-    public double? DescuentoComercial { get; set; }
-    public int? DiasEntrega { get; set; }
-    public string? TipoProveedor { get; set; }
-    public string? Rfc { get; set; }
-    public string? DatosBanco { get; set; }
-    public double? SumaCargo { get; set; }
-    public double? SumaAbono { get; set; }
-    public string? Otro1 { get; set; }
-    public string? Otro2 { get; set; }
-    public float? Otro3 { get; set; }
-    public DateTime? Otro4 { get; set; }
-    public float? Registro { get; set; }
-    public string? Cuenta { get; set; }
-    public float? Iva { get; set; }
-    public string? NotaFactura { get; set; }
-    public string? CompraGasto { get; set; }
-    public byte[]? Pdf { get; set; }
-    public byte[]? Xml { get; set; }
-    public string? Concepto { get; set; }
-    public DateTime? DiasCredito { get; set; }
-    public byte[]? PdfSituacionFiscal { get; set; }
-    public string? Autorizacion { get; set; }
-    public DateTime? FechaHora { get; set; }
-    public byte[]? PdfFactura { get; set; }
-    public byte[]? PdfComprobante { get; set; }
-    public string? Folio { get; set; }
-    public int? Id { get; set; }
-    public int? FolioEntrada { get; set; }
+    public class Proveedor
+    {
+        public int Provedor { get; set; } // ID del proveedor
+        public string NombreRazonSocial { get; set; } // Razón social
+        public string Observaciones { get; set; } // Observaciones sobre el proveedor
+        public decimal Total { get; set; } // Total de la factura
+        public decimal Abono { get; set; } // Abonos realizados
+        public DateTime FechaFactura { get; set; } // Fecha de emisión de la factura
+        public DateTime FechaVencimiento { get; set; } // Fecha de vencimiento
+        public string UUID { get; set; } // Identificador UUID de la factura
+        public decimal Importe { get; set; } // Importe antes de impuestos
+        public decimal IVA { get; set; } // Impuesto aplicado
+        public string FormaPago { get; set; } // Forma de pago
+        public byte[] FacturaPdf { get; set; } // Archivo PDF de la factura
+        public byte[] ComprobantePagoPdf { get; set; } // Archivo PDF del comprobante de pago
+        public string FolioEntrada { get; set; } // Folio de entrada
+    }
 }
