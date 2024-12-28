@@ -32,6 +32,25 @@ namespace HokaProvedorWeb.Controllers
             return View(proveedores);
         }
 
+        [HttpPost("Search")]
+        public async Task<IActionResult> Search(DateTime? fechaInicio, DateTime? fechaFin, string proveedorNombre, string formaPago, string submitButton)
+        {
+            ViewBag.ListaProveedores = await _service.ObtenerListaProveedoresAsync();
+            ViewBag.ProveedorNombreSeleccionado = proveedorNombre;
+
+            List<ProveedorViewModel> proveedores = new List<ProveedorViewModel>();
+            if (submitButton == "Mostrar todos" || proveedorNombre == "todos")
+            {
+                proveedores = await _service.ObtenerProveedoresAsync(fechaInicio, fechaFin, null, formaPago);
+            }
+            else
+            {
+                proveedores = await _service.ObtenerProveedoresAsync(fechaInicio, fechaFin, proveedorNombre, formaPago);
+            }
+
+            return View("Proveedores", proveedores);
+        }
+
         [HttpPost("GuardarAbono")]
         public async Task<IActionResult> GuardarAbono(int folioEntrada, decimal abono, string formaPago, DateTime fechaAbono)
         {

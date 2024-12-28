@@ -53,6 +53,9 @@ namespace HokaProvedorWeb.Data
                 entity.Property(e => e.ConceptoPago).HasColumnName("Concepto");
             });
 
+            modelBuilder.Entity<ProveedorAbono>()
+                        .Ignore(e => e.Proveedor);
+
             base.OnModelCreating(modelBuilder);
         }
     }

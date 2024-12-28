@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using HokaProvedorWeb.Interfaces;
 using HokaProvedorWeb.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HokaProvedorWeb.Services
 {
@@ -13,6 +14,11 @@ namespace HokaProvedorWeb.Services
         public ProveedorService(IProveedorRepository repository)
         {
             _repository = repository;
+        }
+
+        public async Task<List<SelectListItem>> ObtenerListaProveedoresAsync()
+        {
+            return await _repository.ObtenerListaProveedoresAsync();
         }
 
         public async Task<List<ProveedorViewModel>> ObtenerProveedoresAsync(DateTime? fechaInicio, DateTime? fechaFin, string proveedor, string formaPago)

@@ -32,6 +32,7 @@ namespace HokaProvedorWeb.Data.Entities
 
         // Relación con la entidad Proveedor
         [ForeignKey("FolioEntrada")]
+        [NotMapped]
         public Proveedor Proveedor { get; set; } // Navegación a Proveedor
     }
 }

@@ -1,7 +1,9 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace HokaProvedorWeb.Data.Entities
 {
+    [Keyless]
     public class Proveedor
     {
         public int Provedor { get; set; } // ID del proveedor

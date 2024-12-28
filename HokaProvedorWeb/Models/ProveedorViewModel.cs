@@ -1,7 +1,9 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace HokaProvedorWeb.Models
 {
+    [Keyless]
     public class ProveedorViewModel
     {
         public int? Provedor { get; set; }

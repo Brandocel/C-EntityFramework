@@ -7,6 +7,7 @@ using HokaProvedorWeb.Data;
 using HokaProvedorWeb.Models;
 using HokaProvedorWeb.Interfaces;
 using Microsoft.Data.SqlClient;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HokaProvedorWeb.Repositories
 {
@@ -21,7 +22,31 @@ namespace HokaProvedorWeb.Repositories
             _connectionString = configuration.GetConnectionString("DefaultConnection"); // Obtener cadena desde configuración
         }
 
+        public async Task<List<SelectListItem>> ObtenerListaProveedoresAsync()
+        {
+            var listaProveedores = new List<SelectListItem>();
+            var query = "SELECT DISTINCT nombre_rasonsocial FROM provedores WHERE nombre_rasonsocial IS NOT NULL";
 
+            using (var connection = _context.Database.GetDbConnection() as SqlConnection)
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(query, connection))
+                {
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            listaProveedores.Add(new SelectListItem
+                            {
+                                Text = reader["nombre_rasonsocial"].ToString(),
+                                Value = reader["nombre_rasonsocial"].ToString()
+                            });
+                        }
+                    }
+                }
+            }
+            return listaProveedores;
+        }
         public async Task<List<ProveedorViewModel>> ObtenerProveedoresAsync(DateTime? fechaInicio, DateTime? fechaFin, string proveedor, string formaPago)
         {
             var query = @"
