@@ -21,12 +21,8 @@ namespace HokaProvedorWeb.Controllers
         [HttpGet("Proveedores")]
         public async Task<IActionResult> Proveedores(DateTime? fechaInicio, DateTime? fechaFin, string? proveedorNombre, string? formaPago)
         {
-            ViewBag.ListaProveedores = new List<SelectListItem>
-            {
-                new SelectListItem { Text = "Todos", Value = "todos" },
-                new SelectListItem { Text = "Proveedor 1", Value = "Proveedor 1" },
-                new SelectListItem { Text = "Proveedor 2", Value = "Proveedor 2" }
-            };
+            ViewBag.ListaProveedores = await _service.ObtenerListaProveedoresAsync();
+            ViewBag.ProveedorNombreSeleccionado = proveedorNombre;
 
             var proveedores = await _service.ObtenerProveedoresAsync(fechaInicio, fechaFin, proveedorNombre, formaPago);
             return View(proveedores);

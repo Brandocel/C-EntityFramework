@@ -4,73 +4,171 @@
     ViewBag.Title = "Proveedores";
 }
 
-<h1>@ViewBag.Title</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewBag.Title</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
 
-<form asp-action="Search" asp-controller="Proveedor" method="post">
-    <div>
-        <label for="fechaInicio">Fecha Inicio:</label>
-        <input type="date" id="fechaInicio" name="fechaInicio" />
-    </div>
-    <div>
-        <label for="fechaFin">Fecha Fin:</label>
-        <input type="date" id="fechaFin" name="fechaFin" />
-    </div>
-    <div>
-        <label for="proveedorNombre">Proveedor:</label>
-        <select id="proveedorNombre" name="proveedorNombre">
-            <option value="todos">Todos</option>
-            @foreach (var proveedor in ViewBag.ListaProveedores as List<SelectListItem>)
-            {
-                <option value="@proveedor.Value">@proveedor.Text</option>
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+            form div {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
             }
-        </select>
-    </div>
-    <div>
-        <label for="formaPago">Forma de Pago:</label>
-        <select id="formaPago" name="formaPago">
-            <option value="">Seleccionar</option>
-            <option value="Efectivo">Efectivo</option>
-            <option value="Transferencia">Transferencia</option>
-        </select>
-    </div>
-    <button type="submit">Buscar</button>
-</form>
 
-<table>
-    <thead>
-        <tr>
-            <th>Proveedor</th>
-            <th>Razón Social</th>
-            <th>Total</th>
-            <th>Abono</th>
-            <th>Fecha Factura</th>
-            <th>Fecha Vencimiento</th>
-            <th>UUID</th>
-            <th>Forma de Pago</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Count > 0)
-        {
-            foreach (var proveedor in Model)
-            {
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input, select, button {
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            outline: none;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+        .table-container {
+            max-height: 600px; /* Altura máxima para mostrar 10 registros */
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .no-results {
+            text-align: center;
+            font-style: italic;
+            color: #888;
+        }
+    </style>
+</head>
+<body>
+    <h1>@ViewBag.Title</h1>
+
+    <form asp-action="Search" asp-controller="Proveedor" method="post">
+        <div>
+            <label for="fechaInicio">Fecha Inicio:</label>
+            <input type="date" id="fechaInicio" name="fechaInicio" />
+        </div>
+        <div>
+            <label for="fechaFin">Fecha Fin:</label>
+            <input type="date" id="fechaFin" name="fechaFin" />
+        </div>
+        <div>
+            <label for="proveedorNombre">Proveedor:</label>
+            <select id="proveedorNombre" name="proveedorNombre">
+                <option value="todos">Todos</option>
+                @foreach (var proveedor in ViewBag.ListaProveedores as List<SelectListItem>)
+                {
+                    <option value="@proveedor.Value">@proveedor.Text</option>
+                }
+            </select>
+        </div>
+        <div>
+            <label for="formaPago">Forma de Pago:</label>
+            <select id="formaPago" name="formaPago">
+                <option value="">Seleccionar</option>
+                <option value="Efectivo">Efectivo</option>
+                <option value="Transferencia">Transferencia</option>
+            </select>
+        </div>
+        <button type="submit">Buscar</button>
+    </form>
+
+    <div class="table-container">
+        <table>
+            <thead>
                 <tr>
-                    <td>@proveedor.Provedor</td>
-                    <td>@proveedor.NombreRazonSocial</td>
-                    <td>@proveedor.Total?.ToString("C")</td>
-                    <td>@proveedor.Abono?.ToString("C")</td>
-                    <td>@proveedor.FechaFactura?.ToShortDateString()</td>
-                    <td>@proveedor.FechaVencimiento?.ToShortDateString()</td>
-                    <td>@proveedor.UUID</td>
-                    <td>@proveedor.FormaPago</td>
+                    <th>Proveedor</th>
+                    <th>Razón Social</th>
+                    <th>Total</th>
+                    <th>Abono</th>
+                    <th>Fecha Factura</th>
+                    <th>Fecha Vencimiento</th>
+                    <th>UUID</th>
+                    <th>Forma de Pago</th>
                 </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="8">No se encontraron resultados.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Count > 0)
+                {
+                    foreach (var proveedor in Model)
+                    {
+                        <tr>
+                            <td>@proveedor.Provedor</td>
+                            <td>@proveedor.NombreRazonSocial</td>
+                            <td>@proveedor.Total?.ToString("C")</td>
+                            <td>@proveedor.Abono?.ToString("C")</td>
+                            <td>@proveedor.FechaFactura?.ToShortDateString()</td>
+                            <td>@proveedor.FechaVencimiento?.ToShortDateString()</td>
+                            <td>@proveedor.UUID</td>
+                            <td>@proveedor.FormaPago</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="no-results">No se encontraron resultados.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+    
