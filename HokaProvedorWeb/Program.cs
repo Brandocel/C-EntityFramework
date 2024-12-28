@@ -56,6 +56,7 @@ app.UseAuthorization();
 // Configuración de rutas MVC
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"); // Configuración para controladores y vistas
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+    ); // Configuración para controladores y vistas
 
 app.Run();

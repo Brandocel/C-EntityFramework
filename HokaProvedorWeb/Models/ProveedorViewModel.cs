@@ -1,24 +1,27 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 
 namespace HokaProvedorWeb.Models
 {
     public class ProveedorViewModel
     {
-        public int Provedor { get; set; } // ID del proveedor
-        public string NombreRazonSocial { get; set; } // Razón social
-        public string Observaciones { get; set; } // Observaciones sobre el proveedor
-        public decimal Total { get; set; } // Total de la factura
-        public decimal Abono { get; set; } // Abonos realizados
-        public DateTime FechaFactura { get; set; } // Fecha de emisión de la factura
-        public DateTime FechaVencimiento { get; set; } // Fecha de vencimiento
-        public string UUID { get; set; } // Identificador UUID de la factura
-        public decimal Importe { get; set; } // Importe antes de impuestos
-        public decimal IVA { get; set; } // Impuesto aplicado
-        public string FormaPago { get; set; } // Forma de pago
-        public byte[] FacturaPdf { get; set; } // Archivo PDF de la factura
-        public byte[] ComprobantePagoPdf { get; set; } // Archivo PDF del comprobante de pago
-        public string FolioEntrada { get; set; } // Folio de entrada
-        public DateTime FechaAbono { get; set; } // Fecha del último abono
+        public int? Provedor { get; set; }
+        public string? NombreRazonSocial { get; set; }
+        public string? Observaciones { get; set; }
+        public decimal? Total { get; set; }
+        public decimal? Abono { get; set; }
+        public DateTime? FechaFactura { get; set; }
+        public DateTime? FechaVencimiento { get; set; }
+        public string? UUID { get; set; }
+        public decimal? Importe { get; set; }
+        public int? FolioEntrada { get; set; }
+        public string? FormaPago { get; set; }
+
+        // Métodos auxiliares para evitar null
+        public int ProvedorValor => Provedor ?? 0;
+        public string NombreRazonSocialValor => NombreRazonSocial ?? "Sin datos";
+        public decimal TotalValor => Total ?? 0;
+        public decimal AbonoValor => Abono ?? 0;
+        public DateTime FechaFacturaValor => FechaFactura ?? DateTime.MinValue;
+        public DateTime FechaVencimientoValor => FechaVencimiento ?? DateTime.MinValue;
     }
 }

@@ -1,0 +1,77 @@
+﻿@model List<HokaProvedorWeb.Models.ProveedorViewModel>
+
+@{
+    ViewBag.Title = "Listado de Proveedores";
+}
+
+<h1>@ViewBag.Title</h1>
+
+<form asp-action="Buscar" asp-controller="Proveedor" method="post" class="form-inline">
+    <div class="form-group">
+        <label for="fechaInicio">Fecha Inicio:</label>
+        <input type="date" id="fechaInicio" name="fechaInicio" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="fechaFin">Fecha Fin:</label>
+        <input type="date" id="fechaFin" name="fechaFin" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label for="proveedorNombre">Proveedor:</label>
+        <select id="proveedorNombre" name="proveedorNombre" class="form-control">
+            @foreach (var proveedor in ViewBag.ListaProveedores as List<SelectListItem>)
+            {
+                <option value="@proveedor.Value">@proveedor.Text</option>
+            }
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="formaPago">Forma de Pago:</label>
+        <select id="formaPago" name="formaPago" class="form-control">
+            <option value="">Selecciona una forma de pago</option>
+            <option value="Efectivo">Efectivo</option>
+            <option value="Transferencia">Transferencia</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Buscar</button>
+</form>
+
+<table class="table table-bordered mt-4">
+    <thead>
+        <tr>
+            <th>Proveedor</th>
+            <th>Razón Social</th>
+            <th>Observaciones</th>
+            <th>Total</th>
+            <th>Abono</th>
+            <th>Fecha Factura</th>
+            <th>Fecha Vencimiento</th>
+            <th>UUID</th>
+            <th>Forma Pago</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Count > 0)
+        {
+            foreach (var proveedor in Model)
+            {
+                <tr>
+                    <td>@proveedor.Provedor</td>
+                    <td>@proveedor.NombreRazonSocial</td>
+                    <td>@proveedor.Observaciones</td>
+                    <td>@proveedor.Total?.ToString("C")</td>
+                    <td>@proveedor.Abono?.ToString("C")</td>
+                    <td>@(proveedor.FechaFactura?.ToShortDateString() ?? "-")</td>
+                    <td>@(proveedor.FechaVencimiento?.ToShortDateString() ?? "-")</td>
+                    <td>@proveedor.UUID</td>
+                    <td>@proveedor.FormaPago</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="9" class="text-center">No se encontraron resultados.</td>
+            </tr>
+        }
+    </tbody>
+</table>

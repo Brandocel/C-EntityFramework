@@ -24,40 +24,63 @@ namespace HokaProvedorWeb.Repositories
 
         public async Task<List<ProveedorViewModel>> ObtenerProveedoresAsync(DateTime? fechaInicio, DateTime? fechaFin, string proveedor, string formaPago)
         {
-            var query = _context.Provedores.AsQueryable();
+            var query = @"
+                SELECT 
+                    ISNULL(p.provedor, 0) AS Provedor,
+                    ISNULL(p.nombre_rasonsocial, '') AS NombreRazonSocial,
+                    ISNULL(e.Observaciones, '') AS Observaciones,
+                    ISNULL(e.stotal, 0) AS Total,
+                    ISNULL(pa.Abono, 0) AS Abono,
+                    ISNULL(e.Fecha_factura, '1900-01-01') AS FechaFactura,
+                    ISNULL(e.fecha_Vencimiento, '1900-01-01') AS FechaVencimiento,
+                    ISNULL(e.UUID, '') AS UUID,
+                    ISNULL(e.importe, 0) AS Importe,
+                    ISNULL(e.Folio_entrada, 0) AS FolioEntrada,
+                    ISNULL(pa.FormaPago, '') AS FormaPago
+                FROM provedores p
+                LEFT JOIN entradaM e ON p.provedor = e.Almacen
+                LEFT JOIN ProveedorAbono pa ON e.Folio_entrada = pa.folio_entrada
+                WHERE (@FechaInicio IS NULL OR e.Fecha_factura >= @FechaInicio)
+                  AND (@FechaFin IS NULL OR e.Fecha_factura <= @FechaFin)
+            ";
 
-            if (fechaInicio.HasValue)
-                query = query.Where(p => p.FechaFactura >= fechaInicio);
+            var proveedores = new List<ProveedorViewModel>();
 
-            if (fechaFin.HasValue)
-                query = query.Where(p => p.FechaFactura <= fechaFin);
-
-            if (!string.IsNullOrEmpty(proveedor) && proveedor != "todos")
-                query = query.Where(p => p.NombreRazonSocial.Contains(proveedor));
-
-            if (!string.IsNullOrEmpty(formaPago))
-                query = query.Where(p => p.FormaPago == formaPago);
-
-            return await query
-                .Select(p => new ProveedorViewModel
+            using (var connection = new SqlConnection(_connectionString))
+            {
+                await connection.OpenAsync();
+                using (var command = new SqlCommand(query, connection))
                 {
-                    Provedor = p.Provedor,
-                    NombreRazonSocial = p.NombreRazonSocial,
-                    Observaciones = p.Observaciones,
-                    Total = p.Total,
-                    Abono = p.Abono,
-                    FechaFactura = p.FechaFactura,
-                    FechaVencimiento = p.FechaVencimiento,
-                    UUID = p.UUID,
-                    Importe = p.Importe,
-                    IVA = p.IVA,
-                    FormaPago = p.FormaPago,
-                    FacturaPdf = p.FacturaPdf,
-                    ComprobantePagoPdf = p.ComprobantePagoPdf,
-                    FolioEntrada = p.FolioEntrada,
-                }).ToListAsync();
-        }
+                    command.Parameters.AddWithValue("@FechaInicio", fechaInicio ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@FechaFin", fechaFin ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Proveedor", proveedor ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@FormaPago", formaPago ?? (object)DBNull.Value);
 
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            proveedores.Add(new ProveedorViewModel
+                            {
+                                Provedor = reader["Provedor"] as int?,
+                                NombreRazonSocial = reader["NombreRazonSocial"] as string,
+                                Observaciones = reader["Observaciones"] as string,
+                                Total = reader["Total"] as decimal?,
+                                Abono = reader["Abono"] as decimal?,
+                                FechaFactura = reader["FechaFactura"] as DateTime?,
+                                FechaVencimiento = reader["FechaVencimiento"] as DateTime?,
+                                UUID = reader["UUID"] as string,
+                                Importe = reader["Importe"] as decimal?,
+                                FolioEntrada = reader["FolioEntrada"] as int?,
+                                FormaPago = reader["FormaPago"] as string
+                            });
+                        }
+                    }
+                }
+            }
+
+            return proveedores;
+        }
         public async Task<bool> GuardarAbonoAsync(int folioEntrada, decimal abono, string formaPago, DateTime fechaAbono)
         {
             var proveedor = await _context.Provedores.FirstOrDefaultAsync(p => p.FolioEntrada == folioEntrada.ToString());
@@ -104,9 +127,9 @@ namespace HokaProvedorWeb.Repositories
                 return false;
 
             entity.Observaciones = proveedor.Observaciones;
-            entity.Total = proveedor.Total;
-            entity.FechaFactura = proveedor.FechaFactura;
-            entity.FechaVencimiento = proveedor.FechaVencimiento;
+            //entity.Total = proveedor.Total;
+            //entity.FechaFactura = proveedor.FechaFactura;
+            //entity.FechaVencimiento = proveedor.FechaVencimiento;
 
             _context.Provedores.Update(entity);
             await _context.SaveChangesAsync();
