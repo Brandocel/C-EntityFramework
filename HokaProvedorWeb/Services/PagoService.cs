@@ -1,6 +1,5 @@
 ﻿using HokaProvedorWeb.Interfaces;
 using HokaProvedorWeb.Models;
-using HokaProvedorWeb.Repositories;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -21,7 +20,7 @@ namespace HokaProvedorWeb.Services
             return await _pagoRepository.ObtenerPagosAsync();
         }
 
-        public async Task<List<string>> ObtenerNombresProveedoresAsync()
+        public async Task<List<SelectListItem>> ObtenerNombresProveedoresAsync()
         {
             return await _pagoRepository.ObtenerNombresProveedoresAsync();
         }

@@ -5,8 +5,6 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace HokaProvedorWeb.Repositories
@@ -47,7 +45,7 @@ namespace HokaProvedorWeb.Repositories
                         CuentaBancaria = reader.GetString(4),
                         ConceptoPago = reader.GetString(5),
                         Sucursal = reader.GetString(6),
-                        DiasCredito = reader.IsDBNull(7) ? Convert.ToDateTime(reader["diascredito"]) : reader.GetDateTime(7),
+                        DiasCredito = reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7),
                         Importe = reader.IsDBNull(8) ? (decimal?)null : reader.GetDecimal(8),
                         Total = reader.IsDBNull(9) ? (decimal?)null : reader.GetDecimal(9)
                     });
@@ -56,9 +54,9 @@ namespace HokaProvedorWeb.Repositories
             return pagos;
         }
 
-        public async Task<List<string>> ObtenerNombresProveedoresAsync()
+        public async Task<List<SelectListItem>> ObtenerNombresProveedoresAsync()
         {
-            var nombres = new List<string>();
+            var nombres = new List<SelectListItem>();
             using (var connection = new SqlConnection(_connectionString))
             {
                 var query = "SELECT DISTINCT nombre_rasonsocial FROM provedores";
@@ -69,11 +67,13 @@ namespace HokaProvedorWeb.Repositories
                     {
                         while (await reader.ReadAsync())
                         {
-                            // Verifica si el valor es nulo antes de intentar leerlo
-                            if (!reader.IsDBNull(0))
+                            // Verifica si el valor es nulo antes de agregarlo a la lista
+                            var nombreRazonSocial = reader.IsDBNull(0) ? "Sin Nombre" : reader.GetString(0);
+                            nombres.Add(new SelectListItem
                             {
-                                nombres.Add(reader.GetString(0));
-                            }
+                                Value = nombreRazonSocial,
+                                Text = nombreRazonSocial
+                            });
                         }
                     }
                 }
@@ -109,24 +109,60 @@ namespace HokaProvedorWeb.Repositories
             {
                 using (var connection = new SqlConnection(_connectionString))
                 {
-                    connection.Open();
-                    var query = @"INSERT INTO BancoProveedores (formapago, banco, cuentabancaria, conceptopago, sucursal)
-                                  VALUES (@FormaPago, @Banco, @CuentaBancaria, @ConceptoPago, @Sucursal)";
-                    var command = new SqlCommand(query, connection);
-                    command.Parameters.AddWithValue("@FormaPago", model.FormaPago);
-                    command.Parameters.AddWithValue("@Banco", model.Banco);
-                    command.Parameters.AddWithValue("@CuentaBancaria", model.CuentaBancaria);
-                    command.Parameters.AddWithValue("@ConceptoPago", model.ConceptoPago);
-                    command.Parameters.AddWithValue("@Sucursal", model.Sucursal);
+                    await connection.OpenAsync();
 
-                    await command.ExecuteNonQueryAsync();
+                    // Procesar archivo PDF (si está presente)
+                    byte[] pdfBytes = null;
+                    if (model.PdfUpload != null && model.PdfUpload.Length > 0)
+                    {
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            await model.PdfUpload.CopyToAsync(memoryStream);
+                            pdfBytes = memoryStream.ToArray();
+                        }
+                    }
+
+                    // Insertar en la tabla provedores
+                    var queryProveedores = @"INSERT INTO provedores (nombre_rasonsocial, concepto, formapago, banco, CuentaBancaria, sucursal, iva, PdfSituacionFiscal, DiasCredito)
+                                     VALUES (@NombreRazonSocial, @ConceptoPago, @FormaPago, @Banco, @CuentaBancaria, @Sucursal, @Iva, @Pdf, @DiasCredito)";
+                    var commandProveedores = new SqlCommand(queryProveedores, connection);
+
+                    commandProveedores.Parameters.AddWithValue("@NombreRazonSocial", model.NombreRazonSocial ?? (object)DBNull.Value);
+                    commandProveedores.Parameters.AddWithValue("@ConceptoPago", model.ConceptoPago ?? (object)DBNull.Value);
+                    commandProveedores.Parameters.AddWithValue("@FormaPago", model.FormaPago ?? (object)DBNull.Value);
+                    commandProveedores.Parameters.AddWithValue("@Banco", model.Banco ?? (object)DBNull.Value);
+                    commandProveedores.Parameters.AddWithValue("@CuentaBancaria", model.CuentaBancaria ?? (object)DBNull.Value);
+                    commandProveedores.Parameters.AddWithValue("@Sucursal", model.Sucursal ?? (object)DBNull.Value);
+                    commandProveedores.Parameters.AddWithValue("@Iva", model.Iva ?? (object)DBNull.Value);
+                    commandProveedores.Parameters.AddWithValue("@Pdf", pdfBytes ?? (object)DBNull.Value);
+                    commandProveedores.Parameters.AddWithValue("@DiasCredito", model.DiasCredito ?? (object)DBNull.Value);
+
+                    await commandProveedores.ExecuteNonQueryAsync();
+
+                    // Generar un valor para Folio_entrada (si no está en el modelo)
+                    var folioEntrada = model.Id ?? new Random().Next(1, 1000000); // Genera un valor único o utiliza uno preexistente
+
+                    // Insertar en la tabla entradaM
+                    var queryEntradaM = @"INSERT INTO entradaM (Folio_entrada, observaciones, importe, stotal)
+                                  VALUES (@FolioEntrada, @Observaciones, @Importe, @Total)";
+                    var commandEntradaM = new SqlCommand(queryEntradaM, connection);
+
+                    commandEntradaM.Parameters.AddWithValue("@FolioEntrada", folioEntrada);
+                    commandEntradaM.Parameters.AddWithValue("@Observaciones", model.Observaciones ?? (object)DBNull.Value);
+                    commandEntradaM.Parameters.AddWithValue("@Importe", model.Importe ?? (object)DBNull.Value);
+                    commandEntradaM.Parameters.AddWithValue("@Total", model.Total ?? (object)DBNull.Value);
+
+                    await commandEntradaM.ExecuteNonQueryAsync();
+
                     return true;
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error: {ex.Message}");
                 return false;
             }
         }
+
     }
 }

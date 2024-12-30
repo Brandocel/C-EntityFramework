@@ -8,57 +8,21 @@ namespace HokaProvedorWeb.Models
 {
     public class PagoViewModel
     {
-        
+        public int? Id { get; set; } 
         public string? NombreRazonSocial { get; set; }
-
-       
-        public string? FormaPago { get; set; }
-
-        public string? Banco { get; set; }
-
-        public string? CuentaBancaria { get; set; }
-
-       
+        public IEnumerable<SelectListItem>? NombreRazonSocialOptions { get; set; }
         public string? ConceptoPago { get; set; }
-
-       
+        public string? FormaPago { get; set; }
+        public string? Banco { get; set; }
+        public string? CuentaBancaria { get; set; }
         public string? Sucursal { get; set; }
-
-        public string? FolioPago { get; set; }
-
-        
-        public string? Folio { get; set; }
-
-        [DataType(DataType.Date)]
-        public DateTime? DiasCredito { get; set; }
-
-        public int? Id { get; set; }
-
-        public string? Autorizacion { get; set; }
-
-        // Propiedades de archivo
-        public IFormFile? PdfUpload { get; set; }
-        public IFormFile? XmlUpload { get; set; }
-
-        public decimal? Importe { get; set; }
+        public IEnumerable<SelectListItem>? SucursalOptions { get; set; }
         public decimal? Iva { get; set; }
+        public decimal? Importe { get; set; }
         public decimal? Total { get; set; }
-
-        // Opciones de selectores
-        public List<SelectListItem>? SucursalOptions { get; set; }
-        public List<string>? NombreRazonSocialOptions { get; set; }
-        public List<PagoViewModel>? Pagos { get; set; }
-
-        public bool? IsValid()
-        {
-            if (FormaPago == "Deposito")
-            {
-                if (string.IsNullOrEmpty(Banco) || string.IsNullOrEmpty(CuentaBancaria))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+        public string? Observaciones { get; set; }
+        public IFormFile PdfUpload { get; set; }
+        public DateTime? DiasCredito { get; set; }
     }
+
 }

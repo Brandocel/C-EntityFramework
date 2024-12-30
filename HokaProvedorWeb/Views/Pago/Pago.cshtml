@@ -1,160 +1,138 @@
 ﻿@model HokaProvedorWeb.Models.PagoViewModel
 
 @{
-    ViewData["Title"] = "Método de Pago en Efectivo";
+    ViewData["Title"] = "Método de Pago";
 }
 
 <div class="container mt-5">
-    <h2 class="text-center mb-4">Método de Pago en Efectivo</h2>
+    <h2 class="text-center mb-4">Método de Pago</h2>
 
-    <div class="mb-4">
-        <button type="button" class="btn btn-secondary" onclick="window.location.href='@Url.Action("TipoSolicitud", "Pago")'">
-            <i class="fas fa-arrow-left"></i> Regresar
-        </button>
-    </div>
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">@TempData["Message"]</div>
+    }
 
-    <form asp-action="Pago" asp-controller="Pago" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@TempData["Error"]</div>
+    }
+
+    <form asp-action="Pago" method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
         <div class="row g-3">
-            <!-- Selección del método de pago -->
-            <div class="col-md-6">
-                <label for="metodoPago" class="form-label">Método de Pago:</label>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="MetodoPago" id="metodoEfectivo" value="Efectivo" checked>
-                    <label class="form-check-label" for="metodoEfectivo">Efectivo</label>
-                </div>
-                <div class="form-check">
-                    <input class="form-check-input" type="radio" name="MetodoPago" id="metodoTransferencia" value="Transferencia">
-                    <label class="form-check-label" for="metodoTransferencia">Transferencia</label>
-                </div>
-            </div>
-
-            <!-- Selección del proveedor -->
-            @* <div class="col-md-6">
-                <label asp-for="NombreRazonSocial" class="form-label"></label>
-                <select asp-for="NombreRazonSocial" asp-items="Model.NombreRazonSocialOptions" class="form-select" required>
-                    <option value="">Seleccione una opción</option>
-                </select>
-                <span asp-validation-for="NombreRazonSocial" class="text-danger"></span>
-            </div> *@
-
-            <!-- Forma de pago -->
-            <div class="col-md-6">
-                <label asp-for="FormaPago" class="form-label"></label>
-                <select asp-for="FormaPago" class="form-select" id="FormaPago">
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Deposito">Deposito</option>
-                </select>
-                <span asp-validation-for="FormaPago" class="text-danger"></span>
-            </div>
-
-            <!-- Información bancaria -->
-            <div class="col-md-6" id="banco-info" style="display: none;">
-                <label asp-for="Banco" class="form-label"></label>
-                <input asp-for="Banco" class="form-control" />
-                <span asp-validation-for="Banco" class="text-danger"></span>
-
-                <div class="mt-2">
-                    <label asp-for="CuentaBancaria" class="form-label"></label>
-                    <input asp-for="CuentaBancaria" class="form-control" />
-                    <span asp-validation-for="CuentaBancaria" class="text-danger"></span>
-                </div>
-            </div>
-
             <!-- Folio -->
-            <div class="col-md-6" id="folio-group">
-                <label asp-for="Folio" class="form-label"></label>
+           @*  <div class="col-md-6">
+                <label asp-for="Folio" class="form-label">Folio</label>
                 <input asp-for="Folio" class="form-control" readonly />
                 <span asp-validation-for="Folio" class="text-danger"></span>
+            </div> *@
+
+            <!-- Método de Pago -->
+            <div class="col-md-6">
+                <label class="form-label">Método de Pago</label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="FormaPago" value="Efectivo" checked />
+                    <label class="form-check-label">Efectivo</label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="FormaPago" value="Transferencia" />
+                    <label class="form-check-label">Transferencia</label>
+                </div>
             </div>
 
-            <!-- Concepto de pago -->
+            <!-- Nombre del Proveedor -->
             <div class="col-md-6">
-                <label asp-for="ConceptoPago" class="form-label"></label>
-                <input asp-for="ConceptoPago" class="form-control" />
+                <label asp-for="NombreRazonSocial" class="form-label">Nombre del Proveedor</label>
+                <select asp-for="NombreRazonSocial" asp-items="Model.NombreRazonSocialOptions" class="form-select" required>
+                    <option value="">Seleccione un proveedor</option>
+                </select>
+                <span asp-validation-for="NombreRazonSocial" class="text-danger"></span>
+            </div>
+
+            <!-- Concepto de Pago -->
+            <div class="col-md-6">
+                <label asp-for="ConceptoPago" class="form-label">Concepto de Pago</label>
+                <input asp-for="ConceptoPago" class="form-control"  />
                 <span asp-validation-for="ConceptoPago" class="text-danger"></span>
             </div>
 
             <!-- Sucursal -->
             <div class="col-md-6">
-                <label asp-for="Sucursal" class="form-label"></label>
-                <select asp-for="Sucursal" asp-items="Model.SucursalOptions" class="form-select" id="sucursal" onchange="mostrarCiudad()">
-                    <option value="">Seleccione una opción</option>
+                <label asp-for="Sucursal" class="form-label">Sucursal</label>
+                <select asp-for="Sucursal" asp-items="Model.SucursalOptions" class="form-select" required>
+                    <option value="">Seleccione una sucursal</option>
                 </select>
                 <span asp-validation-for="Sucursal" class="text-danger"></span>
             </div>
 
-            <!-- Ciudad -->
+            <!-- Observaciones -->
             <div class="col-md-6">
-                <label for="ciudad" class="form-label">Ciudad</label>
-                <input type="text" id="ciudad" class="form-control" readonly />
+                <label asp-for="Observaciones" class="form-label">Observaciones</label>
+                <textarea asp-for="Observaciones" class="form-control"></textarea>
+                <span asp-validation-for="Observaciones" class="text-danger"></span>
             </div>
 
-            <!-- Importe e IVA -->
+            <!-- Importe -->
             <div class="col-md-6">
-                <label asp-for="Importe" class="form-label"></label>
-                <input asp-for="Importe" class="form-control" type="number" step="0.01" />
+                <label asp-for="Importe" class="form-label">Importe</label>
+                <input asp-for="Importe" type="number" class="form-control" step="0.01" required />
                 <span asp-validation-for="Importe" class="text-danger"></span>
             </div>
 
+            <!-- IVA -->
             <div class="col-md-6">
-                <label asp-for="Iva" class="form-label"></label>
-                <input asp-for="Iva" class="form-control" type="number" step="0.01" />
+                <label asp-for="Iva" class="form-label">IVA (%)</label>
+                <input asp-for="Iva" type="number" class="form-control" step="0.01" />
                 <span asp-validation-for="Iva" class="text-danger"></span>
             </div>
 
             <!-- Total -->
             <div class="col-md-6">
-                <label asp-for="Total" class="form-label"></label>
-                <input asp-for="Total" class="form-control" type="number" readonly />
+                <label asp-for="Total" class="form-label">Total</label>
+                <input asp-for="Total" type="number" class="form-control" readonly />
                 <span asp-validation-for="Total" class="text-danger"></span>
             </div>
 
-            <!-- Subir archivo -->
-            <div class="col-md-12">
-                <label asp-for="PdfUpload" class="form-label"></label>
-                <input asp-for="PdfUpload" type="file" class="form-control" />
+            <!-- PDF Upload -->
+            <div class="col-md-6">
+                <label asp-for="PdfUpload" class="form-label">Cotización o Comprobante (PDF)</label>
+                <input asp-for="PdfUpload" type="file" class="form-control" accept=".pdf" />
                 <span asp-validation-for="PdfUpload" class="text-danger"></span>
             </div>
 
             <!-- Fecha límite de pago -->
             <div class="col-md-6">
-                <label asp-for="DiasCredito" class="form-label"></label>
-                <input asp-for="DiasCredito" class="form-control" type="date" />
+                <label asp-for="DiasCredito" class="form-label">Fecha Límite de Pago</label>
+                <input asp-for="DiasCredito" type="date" class="form-control" />
                 <span asp-validation-for="DiasCredito" class="text-danger"></span>
             </div>
 
-            <!-- Botón de guardar -->
-            <div class="col-12 d-flex justify-content-end">
+            <!-- Botón Guardar -->
+            <div class="col-md-12 d-flex justify-content-end">
                 <button type="submit" class="btn btn-primary">Guardar</button>
             </div>
         </div>
     </form>
-
-    <!-- Mensajes -->
-    @if (ViewBag.Message != null)
-    {
-        <div class="alert alert-info mt-4">@ViewBag.Message</div>
-    }
-
-    @if (ViewBag.Error != null)
-    {
-        <div class="alert alert-danger mt-4">@ViewBag.Error</div>
-    }
 </div>
 
 @section Scripts {
     <script>
-        document.getElementById('FormaPago').addEventListener('change', function () {
-            const isDeposito = this.value === 'Deposito';
-            document.getElementById('banco-info').style.display = isDeposito ? 'block' : 'none';
-            document.getElementById('folio-group').style.display = isDeposito ? 'none' : 'block';
-        });
+        document.getElementById("Importe").addEventListener("input", calcularTotal);
+        document.getElementById("Iva").addEventListener("input", calcularTotal);
 
-        function mostrarCiudad() {
-            const sucursal = document.getElementById('sucursal');
-            const ciudad = document.getElementById('ciudad');
-            const selectedOption = sucursal.options[sucursal.selectedIndex];
-            ciudad.value = selectedOption.text.split(' - ')[1] || '';
+        function calcularTotal() {
+            const importe = parseFloat(document.getElementById("Importe").value) || 0;
+            const iva = parseFloat(document.getElementById("Iva").value) || 0;
+            const total = importe + (importe * (iva / 100));
+            document.getElementById("Total").value = total.toFixed(2);
         }
+
+                const form = document.querySelector("form");
+        form.addEventListener("submit", function (event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            form.classList.add("was-validated");
+        });
     </script>
 }
