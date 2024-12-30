@@ -58,6 +58,16 @@
         </div>
     }
 
+    <!-- Botones de Exportación -->
+    <div class="export-buttons">
+        <a href="@Url.Action("ExportToPdf", "ConsultaPago", new { fechaInicio = ViewBag.FechaInicio, fechaFin = ViewBag.FechaFin, proveedorNombre = ViewBag.ProveedorNombreSeleccionado, formaPago = ViewBag.FormaPago })" class="btn btn-danger">
+            Exportar a PDF
+        </a>
+        <a href="@Url.Action("ExportToExcel", "ConsultaPago", new { fechaInicio = ViewBag.FechaInicio, fechaFin = ViewBag.FechaFin, proveedorNombre = ViewBag.ProveedorNombreSeleccionado, formaPago = ViewBag.FormaPago })" class="btn btn-success">
+            Exportar a Excel
+        </a>
+    </div>
+
     <!-- Resultados -->
     <table class="table">
         <thead>
