@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace HokaProvedorWeb.Controllers
 {
-    [Route("api/[controller]")]
+   
     public class ProveedorController : Controller
     {
         private readonly IProveedorService _service;
@@ -18,7 +18,7 @@ namespace HokaProvedorWeb.Controllers
             _service = service;
         }
 
-        [HttpGet("Proveedores")]
+        [HttpGet]
         public async Task<IActionResult> Proveedores(DateTime? fechaInicio, DateTime? fechaFin, string? proveedorNombre, string? formaPago)
         {
             ViewBag.ListaProveedores = await _service.ObtenerListaProveedoresAsync();

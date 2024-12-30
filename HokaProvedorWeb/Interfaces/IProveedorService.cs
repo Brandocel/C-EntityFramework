@@ -15,6 +15,12 @@ namespace HokaProvedorWeb.Interfaces
         Task<bool> GuardarComprobantePdfAsync(byte[] comprobantePdf, string nombreRazonSocial);
         Task<bool> ActualizarProveedorAsync(ProveedorViewModel proveedor);
         Task<bool> EliminarProveedorAsync(int folioEntrada);
-        Task<bool> GuardarProveedorAsync(AltaProveedorViewModel proveedor);
+        public async Task<bool> GuardarProveedorAsync(AltaProveedorViewModel proveedor)
+        {
+            // Implementación básica o delega a otro método (si es redundante)
+            return await GuardarProveedorCompletoAsync(proveedor, null, null, null);
+        }
+        Task<bool> GuardarProveedorCompletoAsync(AltaProveedorViewModel model, IFormFile constanciaFiscal, IFormFile comprobanteBanco, IFormFile xmlArchivo);
+
     }
 }

@@ -20,20 +20,33 @@ namespace HokaProvedorWeb.Controllers
             return View(new AltaProveedorViewModel());
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> GuardarProveedor(AltaProveedorViewModel model)
+        public async Task<IActionResult> GuardarProveedor(
+            AltaProveedorViewModel model,
+            IFormFile? PdfSituacionFiscal,
+            IFormFile? PdfComprobanteBanco,
+            IFormFile? XmlArchivo)
         {
             if (ModelState.IsValid)
             {
-                bool success = await _service.GuardarProveedorAsync(model);
-                if (success)
+                try
                 {
-                    TempData["Message"] = "Proveedor guardado correctamente.";
-                    return RedirectToAction("AltaProveedor");
+                    bool resultado = await _service.GuardarProveedorCompletoAsync(model, PdfSituacionFiscal, PdfComprobanteBanco, XmlArchivo);
+
+                    if (resultado)
+                    {
+                        TempData["Message"] = "Proveedor guardado correctamente.";
+                        return RedirectToAction("AltaProveedor");
+                    }
+
+                    ModelState.AddModelError("", "Error al guardar el proveedor.");
                 }
-                ModelState.AddModelError("", "Error al guardar el proveedor.");
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("", $"Error: {ex.Message}");
+                }
             }
+
             return View("AltaProveedor", model);
         }
     }

@@ -7,23 +7,182 @@
     <div class="alert alert-success">@TempData["Message"]</div>
 }
 
-@using (Html.BeginForm("GuardarProveedor", "AltaProveedor", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@using (Html.BeginForm("GuardarProveedor", "AltaProveedor", FormMethod.Post, new { enctype = "multipart/form-data", id = "formAltaProveedor" }))
 {
-    <div>
-        <label for="RFC">RFC</label>
-        @Html.TextBoxFor(m => m.RFC, new { @class = "form-control" })
+    <div class="form-container">
+        <!-- Selector de Tipo de Persona -->
+        <div class="form-group-row">
+            <label for="tipoPersona">Tipo de Persona:</label>
+            <select id="tipoPersona" name="TipoPersona" class="form-control" onchange="mostrarCamposPersona()">
+                <option value="">Seleccionar</option>
+                <option value="fisico">Físico</option>
+                <option value="moral">Moral</option>
+            </select>
+        </div>
+
+        <!-- Campos específicos para Físico -->
+        <div id="camposFisico" style="display: none;">
+            <div class="form-group-row">
+                <label for="nombre">Nombre:</label>
+                @Html.TextBoxFor(m => m.Nombre, new { @class = "form-control", placeholder = "Nombre" })
+            </div>
+            <div class="form-group-row">
+                <label for="apellidoPaterno">Apellido Paterno:</label>
+                @Html.TextBox("ApellidoPaterno", null, new { @class = "form-control", placeholder = "Apellido Paterno" })
+            </div>
+            <div class="form-group-row">
+                <label for="apellidoMaterno">Apellido Materno:</label>
+                @Html.TextBox("ApellidoMaterno", null, new { @class = "form-control", placeholder = "Apellido Materno" })
+            </div>
+        </div>
+
+        <!-- Campos específicos para Moral -->
+        <div id="camposMoral" style="display: none;">
+            <div class="form-group-row">
+                <label for="razonSocial">Razón Social:</label>
+                @Html.TextBoxFor(m => m.NombreRazonSocial, new { @class = "form-control", placeholder = "Razón Social" })
+            </div>
+        </div>
+
+        <!-- RFC -->
+        <div class="form-group-row">
+            <label for="RFC">RFC:</label>
+            @Html.TextBoxFor(m => m.RFC, new { @class = "form-control", placeholder = "RFC", maxlength = "13", oninput = "validarRFC()" })
+        </div>
+
+        <!-- Tipo de Cuenta -->
+        <div class="form-group-row">
+            <label for="tipoCuenta">Tipo de Cuenta:</label>
+            @Html.DropDownListFor(m => m.TipoCuenta, new SelectList(new[] { "Cuenta", "Clabe", "Tarjeta" }), new { @class = "form-control", onchange = "mostrarCampoCuenta()" })
+        </div>
+
+        <!-- Número de Cuenta -->
+        <div class="form-group-row" id="campoCuenta" style="display: none;">
+            <label for="numeroCuenta">Número de Cuenta:</label>
+            @Html.TextBoxFor(m => m.CuentaBancaria, new { @class = "form-control", placeholder = "Número de Cuenta" })
+        </div>
+
+        <!-- Banco -->
+        <div class="form-group-row">
+            <label for="banco">Banco:</label>
+            @Html.TextBoxFor(m => m.Banco, new { @class = "form-control", placeholder = "Banco" })
+        </div>
+
+        <!-- Contacto de Venta -->
+        <div class="form-group-row">
+            <label for="contactoVenta">Contacto de Venta:</label>
+            @Html.TextBoxFor(m => m.ContactoVenta, new { @class = "form-control", placeholder = "Contacto de Venta" })
+        </div>
+
+        <!-- Contacto de Cobranza -->
+        <div class="form-group-row">
+            <label for="contactoCobranza">Contacto de Cobranza:</label>
+            @Html.TextBoxFor(m => m.ContactoCobranza, new { @class = "form-control", placeholder = "Contacto de Cobranza" })
+        </div>
+
+        <!-- Subir archivos -->
+        <div class="form-group-row">
+            <label for="constanciaFiscal">Constancia Fiscal (PDF):</label>
+            <input type="file" id="constanciaFiscal" name="PdfSituacionFiscal" class="form-control-file" />
+        </div>
+
+        <div class="form-group-row">
+            <label for="comprobanteBanco">Comprobante de Banco (PDF):</label>
+            <input type="file" id="comprobanteBanco" name="PdfComprobanteBanco" class="form-control-file" />
+        </div>
+
+        <div class="form-group-row">
+            <label for="xmlArchivo">Archivo XML:</label>
+            <input type="file" id="xmlArchivo" name="XmlArchivo" class="form-control-file" />
+        </div>
+
+        <!-- Botón Guardar -->
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
     </div>
-    <div>
-        <label for="NombreRazonSocial">Razón Social</label>
-        @Html.TextBoxFor(m => m.NombreRazonSocial, new { @class = "form-control" })
-    </div>
-    <div>
-        <label for="Nombre">Nombre</label>
-        @Html.TextBoxFor(m => m.Nombre, new { @class = "form-control" })
-    </div>
-    <div>
-        <label for="PdfSituacionFiscal">Constancia Fiscal</label>
-        <input type="file" name="PdfSituacionFiscal" class="form-control" />
-    </div>
-    <button type="submit" class="btn btn-primary">Guardar</button>
 }
+
+@section Scripts {
+    <script>
+        function mostrarCamposPersona() {
+            const tipoPersona = document.getElementById("tipoPersona").value;
+            const camposFisico = document.getElementById("camposFisico");
+            const camposMoral = document.getElementById("camposMoral");
+
+            if (tipoPersona === "fisico") {
+                camposFisico.style.display = "block";
+                camposMoral.style.display = "none";
+            } else if (tipoPersona === "moral") {
+                camposFisico.style.display = "none";
+                camposMoral.style.display = "block";
+            } else {
+                camposFisico.style.display = "none";
+                camposMoral.style.display = "none";
+            }
+        }
+
+        function mostrarCampoCuenta() {
+            const tipoCuenta = document.getElementById("tipoCuenta").value;
+            const campoCuenta = document.getElementById("campoCuenta");
+
+            campoCuenta.style.display = tipoCuenta !== "Cuenta" ? "block" : "none";
+        }
+
+        function validarRFC() {
+            const rfc = document.getElementById("RFC").value;
+            const tipoPersona = document.getElementById("tipoPersona").value;
+
+            if (tipoPersona === "fisico" && rfc.length !== 13) {
+                alert("El RFC de una persona física debe tener 13 dígitos.");
+            } else if (tipoPersona === "moral" && rfc.length !== 12) {
+                alert("El RFC de una persona moral debe tener 12 dígitos.");
+            }
+        }
+    </script>
+}
+
+<style>
+    .form-container {
+        margin: 20px auto;
+        max-width: 100%;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-group-row {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-weight: bold;
+        margin-right: 10px;
+        text-align: right;
+    }
+
+    .form-control, .form-control-file {
+        width: 100%;
+        padding: 10px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        color: white;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+</style>

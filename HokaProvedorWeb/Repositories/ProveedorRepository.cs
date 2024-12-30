@@ -201,5 +201,61 @@ namespace HokaProvedorWeb.Repositories
                 return false;
             }
         }
+
+        public async Task<bool> GuardarProveedorCompletoAsync(
+            AltaProveedorViewModel model,
+            byte[]? pdfFiscal,
+            byte[]? pdfBanco,
+            byte[]? xml)
+        {
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            using var transaction = connection.BeginTransaction();
+
+            try
+            {
+                // Insertar en `provedores`
+                var queryProveedor = @"
+                    INSERT INTO provedores 
+                    (rfc, nombre_rasonsocial, nombre, PdfSituacionFiscal, pdf_Comprobante, xml, Cuenta, Banco, ContactoVenta, ContactoCobranza) 
+                    VALUES 
+                    (@rfc, @nombreRazonSocial, @nombre, @pdfFiscal, @pdfBanco, @xml, @cuenta, @banco, @contactoVenta, @contactoCobranza)";
+
+                using var commandProveedor = new SqlCommand(queryProveedor, connection, transaction);
+                commandProveedor.Parameters.AddWithValue("@rfc", model.RFC ?? (object)DBNull.Value);
+                commandProveedor.Parameters.AddWithValue("@nombreRazonSocial", model.NombreRazonSocial ?? (object)DBNull.Value);
+                commandProveedor.Parameters.AddWithValue("@nombre", model.Nombre ?? (object)DBNull.Value);
+                commandProveedor.Parameters.AddWithValue("@pdfFiscal", pdfFiscal ?? (object)DBNull.Value);
+                commandProveedor.Parameters.AddWithValue("@pdfBanco", pdfBanco ?? (object)DBNull.Value);
+                commandProveedor.Parameters.AddWithValue("@xml", xml ?? (object)DBNull.Value);
+                commandProveedor.Parameters.AddWithValue("@cuenta", model.CuentaBancaria ?? (object)DBNull.Value);
+                commandProveedor.Parameters.AddWithValue("@banco", model.Banco ?? (object)DBNull.Value);
+                commandProveedor.Parameters.AddWithValue("@contactoVenta", model.ContactoVenta ?? (object)DBNull.Value);
+                commandProveedor.Parameters.AddWithValue("@contactoCobranza", model.ContactoCobranza ?? (object)DBNull.Value);
+
+                await commandProveedor.ExecuteNonQueryAsync();
+
+                // Insertar en `entradaM`
+                var queryEntradaM = @"
+                    INSERT INTO entradaM (uuid, pdf_factura, pdf_comprobante)
+                    VALUES (@uuid, @pdfFiscal, @pdfBanco)";
+
+                using var commandEntradaM = new SqlCommand(queryEntradaM, connection, transaction);
+                commandEntradaM.Parameters.AddWithValue("@uuid", Guid.NewGuid().ToString());
+                commandEntradaM.Parameters.AddWithValue("@pdfFiscal", pdfFiscal ?? (object)DBNull.Value);
+                commandEntradaM.Parameters.AddWithValue("@pdfBanco", pdfBanco ?? (object)DBNull.Value);
+
+                await commandEntradaM.ExecuteNonQueryAsync();
+
+                transaction.Commit();
+                return true;
+            }
+            catch
+            {
+                transaction.Rollback();
+                throw;
+            }
+        }
     }
 }

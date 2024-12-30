@@ -16,5 +16,6 @@ namespace HokaProvedorWeb.Interfaces
         Task<bool> ActualizarProveedorAsync(ProveedorViewModel proveedor);
         Task<bool> EliminarProveedorAsync(int folioEntrada);
         Task<bool> GuardarProveedorAsync(AltaProveedorViewModel proveedor);
+        Task<bool> GuardarProveedorCompletoAsync(AltaProveedorViewModel model, byte[]? pdfFiscal, byte[]? pdfBanco, byte[]? xml);
     }
 }

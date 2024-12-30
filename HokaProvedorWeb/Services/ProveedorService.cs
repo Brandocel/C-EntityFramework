@@ -63,10 +63,28 @@ namespace HokaProvedorWeb.Services
             return await _repository.EliminarProveedorAsync(folioEntrada);
         }
 
-        public async Task<bool> GuardarProveedorAsync(AltaProveedorViewModel proveedor)
+        public async Task<bool> GuardarProveedorCompletoAsync(
+           AltaProveedorViewModel model,
+           IFormFile? constanciaFiscal,
+           IFormFile? comprobanteBanco,
+           IFormFile? xmlArchivo)
         {
-            // Implementación del método
-            return await _repository.GuardarProveedorAsync(proveedor);
+            // Convertir archivos en bytes
+            byte[]? pdfFiscal = constanciaFiscal != null ? await ConvertirArchivoABytes(constanciaFiscal) : null;
+            byte[]? pdfBanco = comprobanteBanco != null ? await ConvertirArchivoABytes(comprobanteBanco) : null;
+            byte[]? xml = xmlArchivo != null ? await ConvertirArchivoABytes(xmlArchivo) : null;
+
+            // Llamar al repositorio para guardar los datos
+            return await _repository.GuardarProveedorCompletoAsync(model, pdfFiscal, pdfBanco, xml);
         }
+
+        private async Task<byte[]> ConvertirArchivoABytes(IFormFile archivo)
+        {
+            using var memoryStream = new MemoryStream();
+            await archivo.CopyToAsync(memoryStream);
+            return memoryStream.ToArray();
+        }
+
+
     }
 }
