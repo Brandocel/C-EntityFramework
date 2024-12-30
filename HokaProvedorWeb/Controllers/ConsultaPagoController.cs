@@ -52,5 +52,6 @@ namespace HokaProvedorWeb.Controllers
             var abonos = await _service.ObtenerAbonosAsync(nombreRazonSocial);
             return Json(abonos);
         }
+
     }
 }

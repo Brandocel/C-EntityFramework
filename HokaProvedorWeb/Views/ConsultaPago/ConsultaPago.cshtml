@@ -7,75 +7,196 @@
 <div class="container">
     <h1>@ViewBag.Title</h1>
 
-    <form asp-action="ConsultaPago" method="post">
-        <div class="form-group">
-            <label for="fechaInicio">Fecha Inicio:</label>
-            <input type="date" name="fechaInicio" class="form-control" />
-        </div>
-
-        <div class="form-group">
-            <label for="fechaFin">Fecha Fin:</label>
-            <input type="date" name="fechaFin" class="form-control" />
-        </div>
-
-        <div class="form-group">
-            <label for="proveedorNombre">Proveedor:</label>
-            <select name="proveedorNombre" class="form-control">
-                <option value="">Seleccione un proveedor</option>
-                @foreach (var proveedor in ViewBag.ListaProveedores)
-                {
-                    <option value="@proveedor.Value">@proveedor.Text</option>
-                }
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="formaPago">Forma de Pago:</label>
-            <select name="formaPago" class="form-control">
-                <option value="">Seleccione una forma de pago</option>
-                <option value="Efectivo">Efectivo</option>
-                <option value="Transferencia">Transferencia</option>
-            </select>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Buscar</button>
-    </form>
-
-    @if (Model != null && Model.Count > 0)
+    @using (Html.BeginForm("ConsultaPago", "ConsultaPago", FormMethod.Post, new { @class = "search-form", id = "searchForm" }))
     {
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Folio Entrada</th>
-                    <th>Proveedor</th>
-                    <th>Nombre/Razón Social</th>
-                    <th>RFC</th>
-                    <th>Concepto</th>
-                    <th>Fecha Factura</th>
-                    <th>Importe</th>
-                    <th>Abono</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
+        <div class="form-container">
+            <!-- Fechas -->
+            <div class="form-group">
+                <label for="fechaInicio">Fecha Inicio:</label>
+                @Html.TextBox("fechaInicio", ViewBag.FechaInicio as string, new { @type = "date", @class = "form-control", id = "fechaInicio" })
+            </div>
+
+            <div class="form-group">
+                <label for="fechaFin">Fecha Fin:</label>
+                @Html.TextBox("fechaFin", ViewBag.FechaFin as string, new { @type = "date", @class = "form-control", id = "fechaFin" })
+            </div>
+
+            <!-- Proveedor -->
+            <div class="form-group">
+                <label for="proveedorNombre">Proveedor:</label>
+                <select id="proveedorNombre" name="proveedorNombre" class="form-control">
+                    <option value="">Selecciona un proveedor</option>
+                    <option value="todos" selected="@((string)ViewBag.ProveedorNombreSeleccionado == "todos")">
+                        Mostrar todos los proveedores
+                    </option>
+                    @if (ViewBag.ListaProveedores != null)
+                    {
+                        foreach (var proveedor in (List<SelectListItem>)ViewBag.ListaProveedores)
+                        {
+                            <option value="@proveedor.Value" selected="@((string)ViewBag.ProveedorNombreSeleccionado == proveedor.Value)">
+                                @proveedor.Text
+                            </option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <!-- Forma de Pago -->
+            <div class="form-group">
+                <label for="formaPago">Forma de Pago:</label>
+                <select id="formaPago" name="formaPago" class="form-control">
+                    <option value="" selected="@((string)ViewBag.FormaPago == null)">Selecciona una forma de pago</option>
+                    <option value="Efectivo" selected="@((string)ViewBag.FormaPago == "Efectivo")">Efectivo</option>
+                    <option value="Transferencia" selected="@((string)ViewBag.FormaPago == "Transferencia")">Transferencia</option>
+                </select>
+            </div>
+
+            <!-- Botón Buscar -->
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Buscar</button>
+            </div>
+        </div>
+    }
+
+    <!-- Resultados -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Fecha Factura</th>
+                <th>Folio Entrada</th>
+                <th>Proveedor</th>
+                <th>Razón Social</th>
+                <th>RFC</th>
+                <th>Concepto</th>
+                <th>Total</th>
+                <th>Saldo</th>
+                <th>Abono</th>
+                <th>Fecha Abono</th>
+                <th>Forma de Pago</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Count > 0)
+            {
+                foreach (var item in Model)
                 {
                     <tr>
+                        <td>@(item.FechaFactura?.ToShortDateString() ?? "-")</td>
                         <td>@item.FolioEntrada</td>
                         <td>@item.Proveedor</td>
                         <td>@item.NombreRazonSocial</td>
                         <td>@item.RFC</td>
                         <td>@item.Concepto</td>
-                        <td>@(item.FechaFactura.HasValue ? item.FechaFactura.Value.ToShortDateString() : "N/A")</td>
-                        <td>@(item.Importe.HasValue ? item.Importe.Value.ToString("C") : "N/A")</td>
-                        <td>@(item.Abono.HasValue ? item.Abono.Value.ToString("C") : "N/A")</td>
-
+                        <td>@string.Format("{0:C}", item.Total ?? 0)</td>
+                        <td>@string.Format("{0:C}", item.Saldo ?? 0)</td>
+                        <td>@string.Format("{0:C}", item.Abono ?? 0)</td>
+                        <td>@(item.FechaAbono?.ToShortDateString() ?? "-")</td>
+                        <td>@item.FormaPago</td>
+                        <td>
+                            <button class="btn btn-info" onclick="verAbonos('@item.NombreRazonSocial')">
+                                Ver Abonos
+                            </button>
+                        </td>
                     </tr>
                 }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>No se encontraron resultados.</p>
-    }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="11" class="text-center">No se encontraron resultados.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
+
+<div id="abonosModal" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close" onclick="cerrarModal()">&times;</span>
+        <h3>Detalles de Abonos</h3>
+        <div id="modalContent">
+            <!-- Los detalles de abonos se cargarán aquí dinámicamente -->
+        </div>
+    </div>
+</div>
+<div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:999;"></div>
+
+<script>
+            function verAbonos(nombreRazonSocial) {
+        fetch(`/ConsultaPago/GetAbonos?nombreRazonSocial=${encodeURIComponent(nombreRazonSocial)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length === 0) {
+                    document.getElementById('modalContent').innerHTML = "<p>No hay abonos disponibles para este proveedor.</p>";
+                } else {
+                    let contenido = `<h3>Abonos para: ${nombreRazonSocial}</h3>`;
+                    contenido += `
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Abono</th>
+                                    <th>Saldo</th>
+                                    <th>Fecha Abono</th>
+                                    <th>Forma de Pago</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    data.forEach(abono => {
+                        contenido += `
+                            <tr>
+                                <td>${abono.abono ? abono.abono.toFixed(2) : "N/A"}</td>
+                                <td>${abono.saldo ? abono.saldo.toFixed(2) : "N/A"}</td>
+                                <td>${abono.fechaAbono ? new Date(abono.fechaAbono).toLocaleDateString() : "N/A"}</td>
+                                <td>${abono.formaPago || "N/A"}</td>
+                            </tr>
+                        `;
+                    });
+
+                    contenido += `
+                            </tbody>
+                        </table>
+                    `;
+
+                    document.getElementById('modalContent').innerHTML = contenido;
+                }
+
+                document.getElementById('abonosModal').style.display = 'block';
+                document.getElementById('modalOverlay').style.display = 'block';
+            })
+            .catch(error => console.error('Error al obtener los abonos:', error));
+    }
+
+    function cerrarModal() {
+        document.getElementById('abonosModal').style.display = 'none';
+        document.getElementById('modalOverlay').style.display = 'none';
+    }
+
+</script>
+
+<style>
+    .modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1000;
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    .modal-content {
+        position: relative;
+    }
+
+    .close {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 18px;
+        cursor: pointer;
+    }
+</style>

@@ -30,6 +30,7 @@ public class ConsultaPagoService : IConsultaPagoService
         return await _repository.ObtenerAbonosAsync(nombreRazonSocial);
     }
 
+
     public async Task<byte[]> ExportarPagosAPdfAsync(DateTime? fechaInicio, DateTime? fechaFin, string proveedorNombre, string formaPago)
     {
         var pagos = await _repository.ObtenerProveedoresAsync(fechaInicio, fechaFin, proveedorNombre, formaPago);
@@ -41,4 +42,5 @@ public class ConsultaPagoService : IConsultaPagoService
         var pagos = await _repository.ObtenerProveedoresAsync(fechaInicio, fechaFin, proveedorNombre, formaPago);
         return await _repository.ExportarPagosAExcelAsync(pagos);
     }
+
 }

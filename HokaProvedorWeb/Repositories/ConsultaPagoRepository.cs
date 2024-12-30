@@ -117,10 +117,14 @@ public class ConsultaPagoRepository : IConsultaPagoRepository
         {
             await connection.OpenAsync();
             string query = @"
-            SELECT Abono, fecha_abono AS FechaAbono
+            SELECT 
+                Abono, 
+                Saldo, 
+                fecha_abono AS FechaAbono, 
+                FormaPago 
             FROM ProveedorAbono
-            WHERE nombre_rasonsocial = @NombreRazonSocial
-        ";
+            WHERE nombre_rasonsocial = @NombreRazonSocial";
+
             using (var command = new SqlCommand(query, connection))
             {
                 command.Parameters.AddWithValue("@NombreRazonSocial", nombreRazonSocial);
@@ -130,15 +134,59 @@ public class ConsultaPagoRepository : IConsultaPagoRepository
                     {
                         abonos.Add(new ConsultaPagoViewModel
                         {
-                            Abono = reader["Abono"] != DBNull.Value ? Convert.ToDecimal(reader["Abono"]) : 0,
-                            FechaAbono = reader["FechaAbono"] != DBNull.Value ? Convert.ToDateTime(reader["FechaAbono"]) : DateTime.MinValue
+                            Abono = reader["Abono"] != DBNull.Value ? Convert.ToDecimal(reader["Abono"]) : (decimal?)null,
+                            Saldo = reader["Saldo"] != DBNull.Value ? Convert.ToDecimal(reader["Saldo"]) : (decimal?)null,
+                            FechaAbono = reader["FechaAbono"] != DBNull.Value ? Convert.ToDateTime(reader["FechaAbono"]) : (DateTime?)null,
+                            FormaPago = reader["FormaPago"] != DBNull.Value ? reader["FormaPago"].ToString() : null
                         });
+
                     }
                 }
             }
         }
         return abonos;
     }
+
+
+    //public async Task<List<ConsultaPagoViewModel>> ObtenerAbonosAsync(string nombreRazonSocial)
+    //{
+    //    var abonos = new List<ConsultaPagoViewModel>();
+    //    using (var connection = new SqlConnection(_connectionString))
+    //    {
+    //        await connection.OpenAsync();
+    //        string query = @"
+    //        SELECT 
+    //            pa.Abono, 
+    //            pa.Saldo, 
+    //            pa.fecha_abono AS FechaAbono,
+    //            pa.FormaPago,
+    //            pa.Folio_entrada AS FolioEntrada
+    //        FROM ProveedorAbono pa
+    //        WHERE pa.nombre_rasonsocial = @NombreRazonSocial
+    //        ORDER BY pa.fecha_abono ASC";
+
+    //        using (var command = new SqlCommand(query, connection))
+    //        {
+    //            command.Parameters.AddWithValue("@NombreRazonSocial", nombreRazonSocial);
+    //            using (var reader = await command.ExecuteReaderAsync())
+    //            {
+    //                while (await reader.ReadAsync())
+    //                {
+    //                    abonos.Add(new ConsultaPagoViewModel
+    //                    {
+    //                        Abono = reader["Abono"] != DBNull.Value ? Convert.ToDecimal(reader["Abono"]) : 0,
+    //                        Saldo = reader["Saldo"] != DBNull.Value ? Convert.ToDecimal(reader["Saldo"]) : 0,
+    //                        FechaAbono = reader["FechaAbono"] != DBNull.Value ? Convert.ToDateTime(reader["FechaAbono"]) : DateTime.MinValue,
+    //                        FormaPago = reader["FormaPago"].ToString(),
+    //                        FolioEntrada = reader["FolioEntrada"].ToString()
+    //                    });
+    //                }
+    //            }
+    //        }
+    //    }
+    //    return abonos;
+    //}
+
 
     public async Task<byte[]> ExportarPagosAPdfAsync(List<ConsultaPagoViewModel> pagos)
     {
